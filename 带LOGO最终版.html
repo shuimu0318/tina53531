@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级积分管理系统V8</title>
+    <!-- 引入Roboto字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 全局应用Roboto字体并加粗 */
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--ios-dark-blue); 
+            color: #1c1c1e;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            font-size: 0.9rem;
+            font-weight: 500;
+            /* 整体文字加粗 */
+        }
+
+        :root {
+             --ios-gray-1: #f2f2f7;
+            --ios-gray-2: #e5e5ea;
+            --ios-gray-3: #d1d1d6;
+            --ios-gray-4: #c7c7cc;
+            --ios-light-blue: #1976D2; /* 浅蓝色 */
+            --ios-yellow: #fff9c4; /* 浅黄色 */
+            --ios-dark-blue: #CCE5FF; /* 深蓝色 */
+            --ios-red: #EF5350;
+            --ios-orange: #FFCC80;
+            --ios-green: #00CED1;/* 松石绿 */
+            --ios-white: #ffffff; /* 白色 */
+        }
+
+        .header {
+            background-color: white;
+            padding: 10px 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--ios-gray-2);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            /* 标题加粗 */
+            color: var(--ios-light-blue); /* 修改为深蓝色 */
+            flex: 1;
+            text-align: center;
+        }
+
+        .class-container {
+            display: flex;
+            flex-direction: row;
+            margin: 8px 12px;
+            gap: 12px; /* 增加间距 */
+            justify-content: space-between;
+            align-items: center; /* 新增：垂直方向居中对齐 */
+            min-height: 120px; /* 固定容器高度，确保对齐 */
+        }
+
+        .logo-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%; /* 填满容器高度 */
+            padding: 8px; /* 增加内边距 */
+            box-sizing: border-box; /* 确保padding不影响整体尺寸 */
+        }
+
+        .logo {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .class-info-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%; /* 填满容器高度 */
+        }
+
+        .class-selector {
+            background: white;
+            padding: 6px 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 6px;
+        }
+
+        .class-selector select {
+            flex: 1;
+            padding: 4px;
+            border: 1px solid var(--ios-gray-3);
+            border-radius: 4px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .class-selector button {
+            padding: 4px 8px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .class-info {
+            background: white;
+            padding: 6px 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .class-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .class-name input {
+            flex: 1;
+            padding: 4px;
+            border: 1px solid var(--ios-gray-3);
+            border-radius: 4px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .class-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #636366;
+            font-weight: 500;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-card:hover {
+            transform: translateY(-1px);
+        }
+
+        .student-id {
+            font-size: 0.75rem;
+            color: #636366;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .student-name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .student-points {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .points-value {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .point-controls {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .point-input {
+            flex: 1;
+            padding: 4px;
+            border: 1px solid var(--ios-gray-3);
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 4px;
+            margin-top: auto;
+        }
+
+        button {
+            background: var(--ios-gray-2);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        button.primary {
+            background: var(--ios-light-blue); /* 修改为深蓝色 */
+            color: white;
+            font-weight: 600;
+        }
+
+        button.positive {
+            background: var(--ios-red);
+            color: white;
+            font-weight: bold;
+        }
+
+        button.negative {
+             background: var(--ios-orange); /* 修改为浅黄色 */
+            color: var(--ios-light-blue); /* 修改文字颜色为深蓝色，提高可读性 */
+            font-weight: bold;
+        }
+
+        button.warning {
+            background: var(--ios-orange);
+            color: white;
+            font-weight: 600;
+        }
+
+        button.red {
+            background: var(--ios-red);
+            color: white;
+            font-weight: 600;
+        }
+
+        button.small {
+            padding: 3px 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid var(--ios-gray-3);
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-sizing: border-box;
+        }
+
+        .floating-actions {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-end;
+        }
+
+        .floating-btn-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .floating-btn-label {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.45rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .floating-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--ios-light-blue); /* 修改为深蓝色 */
+            color: white;
+            border: none;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.5rem;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .floating-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .floating-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-log {
+            margin-top: 6px;
+            border-top: 1px solid var(--ios-gray-1);
+            padding-top: 4px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .history-item {
+            padding: 3px 0;
+            border-bottom: 1px solid var(--ios-gray-1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-time {
+            color: #8e8e93;
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+
+        .history-detail {
+            flex: 1;
+            margin-left: 4px;
+            color: #636366;
+            font-weight: 500;
+        }
+
+        .history-amount {
+            font-weight: 600;
+        }
+
+        .history-amount.positive {
+            color: var(--ios-red);
+        }
+
+        .history-amount.negative {
+              color: var(--ios-orange); /* 修改为浅黄色 */
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px 10px;
+            color: #8e8e93;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 320px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color:  var(--ios-green); 
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .student-import-instructions {
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            color: #636366;
+            font-weight: 500;
+        }
+
+        .show-more-btn {
+            width: 100%;
+            text-align: center;
+            padding: 2px 0;
+            font-size: 0.6rem;
+            color: var(--ios-light-blue);
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        .show-more-btn:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+
+            .student-card {
+                min-height: 140px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .floating-btn-label {
+                display: none;
+            }
+
+            .class-selector {
+                flex-direction: column;
+            }
+
+            .class-container {
+                flex-direction: column; /* 小屏幕下垂直排列 */
+                min-height: auto; /* 取消固定高度 */
+            }
+            
+            .logo-container {
+                max-height: 100px; /* 限制logo高度 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>班级积分管理系统V8</h1>
+    </div>
+
+    <div class="class-container">
+        <div class="logo-container">
+          <div class="ce-logo">
+  <div class="ce-mark">加美</div>
+  <div class="ce-text">
+    <div class="christina">Christina's</div>
+    <div class="english">English</div>
+  </div>
+</div>
+
+<style>
+.ce-logo {
+  font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  width: fit-content;
+}
+
+/* 英伦绿渐变方案 */
+.ce-mark {
+  background: linear-gradient(135deg, #005a30, #003d1c); /* 深绿渐变 */
+  color: #f8f8f8;
+  font-size: 26px;
+  font-weight: 700;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif SC', 'PingFang SC', serif; /* 衬线字体更显英伦风 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.ce-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.christina {
+  font-size: 24px;
+   color: #003d1c; /* 与徽标同色系 */
+  letter-spacing: 0.6px;
+  font-weight: 500;
+  font-style: italic;
+  margin-bottom: 2px;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif; /* 经典英文字体 */
+}
+
+.english {
+  font-size: 28px;
+  font-weight: 600;
+  color: #003d1c; /* 与徽标同色系 */
+  letter-spacing: 0.8px;
+  font-family: 'Libre Baskerville', 'Times New Roman', serif; /* 经典英文字体 */
+}
+
+/* 字体加载 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=Libre+Baskerville:ital@0;1&family=EB+Garamond:wght@600&display=swap');
+</style>
+        </div>
+        <div class="class-info-container">
+            <div class="class-info">
+                <div class="class-name">
+                    <span>班级名称:</span>
+                    <input type="text" id="className" placeholder="请输入班级名称" onchange="updateClassName()">
+                </div>
+                <div class="class-stats">
+                    <span>学生人数: <span id="studentCount">0</span></span>
+                    <span>总积分: <span id="totalPoints">0</span></span>
+                </div>
+            </div>
+
+            <div class="class-selector">
+                <select id="classSelect" onchange="changeClass()"></select>
+                <button class="primary" onclick="showAddClassModal()">新增班级</button>
+                <button class="negative" onclick="showDeleteClassModal()">删除班级</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="studentContainer">
+        <div class="empty-state">
+            <p>暂无学生数据</p>
+            <div style="display: flex; gap: 6px; justify-content: center; margin-top: 8px;">
+                <button class="primary" onclick="showAddStudentModal()">添加单个学生</button>
+                <button class="positive" onclick="showImportStudentsModal()">批量导入学生</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-actions">
+        <div class="floating-btn-container">
+            <span class="floating-btn-label">批量操作</span>
+            <button class="floating-button" onclick="showBatchModal()">批量</button>
+        </div>
+        <div class="floating-btn-container">
+            <span class="floating-btn-label">添加学生</span>
+            <button class="floating-button" onclick="showAddStudentModal()">添加</button>
+        </div>
+        <div class="floating-btn-container">
+            <span class="floating-btn-label">导入学生</span>
+            <button class="floating-button" onclick="showImportStudentsModal()">导入</button>
+        </div>
+        <div class="floating-btn-container">
+            <span class="floating-btn-label">导出数据</span>
+            <button class="floating-button" onclick="exportData()">导出</button>
+        </div>
+    </div>
+
+    <!-- 模态框部分 -->
+    <!-- 添加学生模态框 -->
+    <div class="modal" id="addStudentModal">
+        <div class="modal-content">
+            <div class="modal-title">添加学生</div>
+            <div>
+                <label>学生姓名:</label>
+                <input type="text" id="newStudentName" placeholder="请输入学生姓名">
+            </div>
+            <div>
+                <label>初始积分:</label>
+                <input type="number" id="newStudentPoints" value="0" min="0">
+            </div>
+            <div class="modal-actions">
+                <button class="negative" onclick="hideModal('addStudentModal')">取消</button>
+                <button class="positive" onclick="addStudent()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加班级模态框 -->
+    <div class="modal" id="addClassModal">
+        <div class="modal-content">
+            <div class="modal-title">添加班级</div>
+            <div>
+                <label>班级名称:</label>
+                <input type="text" id="newClassName" placeholder="请输入班级名称">
+            </div>
+            <div class="modal-actions">
+                <button class="negative" onclick="hideModal('addClassModal')">取消</button>
+                <button class="positive" onclick="createNewClass()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动学生模态框 -->
+    <div class="modal" id="moveStudentModal">
+        <div class="modal-content">
+            <div class="modal-title">调整学生班级</div>
+            <div>
+                <label>学生序号:</label>
+                <input type="text" id="moveStudentId" placeholder="请输入学生序号" readonly>
+            </div>
+            <div>
+                <label>目标班级:</label>
+                <select id="targetClassSelect"></select>
+            </div>
+            <div class="modal-actions">
+                <button class="negative" onclick="hideModal('moveStudentModal')">取消</button>
+                <button class="positive" onclick="moveStudentToClass()">确认移动</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除学生模态框 -->
+    <div class="modal" id="deleteStudentModal">
+        <div class="modal-content">
+            <div class="modal-title" style="color: var(--ios-green);">删除学生</div>
+            <div>
+                <p>确定要删除学生 <span id="deleteStudentName" style="font-weight: bold;"></span> 吗？</p>
+                <p style="color: var(--ios-red); font-size: 0.7rem;">此操作不可撤销！</p>
+            </div>
+            <div class="modal-actions">
+                <button class="primary" onclick="hideModal('deleteStudentModal')">取消</button>
+                <button class="negative" onclick="deleteStudent()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量操作模态框 -->
+    <div class="modal" id="batchModal">
+        <div class="modal-content">
+            <div class="modal-title">批量操作</div>
+            <div>
+                <label>操作类型:</label>
+                <select id="batchType" class="point-input" onchange="updateBatchModalUI()">
+                    <option value="add">增加积分</option>
+                    <option value="deduct">扣除积分</option>
+                    <option value="reset">清空积分</option>
+                </select>
+            </div>
+            <div id="batchAmountContainer">
+                <label>积分数量:</label>
+                <input type="number" id="batchAmount" value="1" min="1" class="point-input">
+            </div>
+            <div class="modal-actions">
+                <button class="negative" onclick="hideModal('batchModal')">取消</button>
+                <button class="positive" onclick="performBatchOperation()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除班级模态框 -->
+    <div class="modal" id="deleteClassModal">
+        <div class="modal-content">
+            <div class="modal-title">删除班级</div>
+            <div>
+                <p>确定要删除当前班级 <span id="deleteClassName" style="font-weight: bold;"></span> 吗？</p>
+                <p style="color: var(--ios-red); font-size: 0.7rem;">此操作不可撤销！</p>
+            </div>
+            <div class="modal-actions">
+                <button class="primary" onclick="hideModal('deleteClassModal')">取消</button>
+                <button class="negative" onclick="deleteClass()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入学生模态框 -->
+    <div class="modal" id="importStudentsModal">
+        <div class="modal-content">
+            <div class="modal-title">批量导入学生</div>
+            <div class="student-import-instructions">
+                <p>请按照以下格式准备CSV文件：</p>
+                <p>学生姓名,初始积分</p>
+                <p>例如：张三,10</p>
+                <p>注意：学生将导入到当前班级</p>
+            </div>
+            <div>
+                <input type="file" id="studentImportFile" accept=".csv">
+            </div>
+            <div class="modal-actions">
+                <button class="negative" onclick="hideModal('importStudentsModal')">取消</button>
+                <button class="positive" onclick="importStudents()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let appData = JSON.parse(localStorage.getItem('classPointsApp')) || {
+            classes: [
+                {
+                    id: 'class-1',
+                    name: '默认班级',
+                    students: []
+                }
+            ],
+            currentClassId: 'class-1'
+        };
+
+        // 初始化应用
+        function init() {
+            renderClassSelector();
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 渲染班级选择器
+        function renderClassSelector() {
+            const classSelect = document.getElementById('classSelect');
+            classSelect.innerHTML = '';
+            appData.classes.forEach((cls) => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                if (cls.id === appData.currentClassId) {
+                    option.selected = true;
+                }
+                classSelect.appendChild(option);
+            });
+        }
+
+        // 渲染班级信息
+        function renderClassInfo() {
+            const currentClass = getCurrentClass();
+            const classNameInput = document.getElementById('className');
+            const studentCountSpan = document.getElementById('studentCount');
+            const totalPointsSpan = document.getElementById('totalPoints');
+
+            classNameInput.value = currentClass.name;
+            studentCountSpan.textContent = currentClass.students.length;
+            const totalPoints = currentClass.students.reduce((sum, student) => sum + student.points, 0);
+            totalPointsSpan.textContent = totalPoints;
+        }
+
+        // 渲染学生列表
+        function renderStudents() {
+            const studentContainer = document.getElementById('studentContainer');
+            const currentClass = getCurrentClass();
+
+            if (currentClass.students.length === 0) {
+                studentContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>暂无学生数据</p>
+                        <div style="display: flex; gap: 6px; justify-content: center; margin-top: 8px;">
+                            <button class="primary" onclick="showAddStudentModal()">添加单个学生</button>
+                            <button class="positive" onclick="showImportStudentsModal()">批量导入学生</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                studentContainer.innerHTML = '';
+                currentClass.students.forEach((student, index) => {
+                    const card = document.createElement('div');
+                    card.classList.add('student-card');
+                    
+                    // 确保history数组存在
+                    if (!student.history) {
+                        student.history = [];
+                    }
+                    
+                    // 只显示最近的5条记录
+                    const recentHistory = student.history.slice(-5);
+                    const hasMore = student.history.length > 5;
+                    
+                    card.innerHTML = `
+                        <div class="student-id">序号: ${student.id || (index + 1)}</div>
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-points">
+                            <span>积分: <span class="points-value">${student.points}</span></span>
+                            <div class="point-controls">
+                                <input type="number" class="point-input" value="1">
+                                <button class="positive" onclick="changePoints(${index}, 1, this.previousElementSibling.value)">+</button>
+                                <button class="negative" onclick="changePoints(${index}, -1, this.previousElementSibling.previousElementSibling.value)">-</button>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button class="primary small" onclick="showMoveStudentModal(${index})">调整班级</button>
+                            <button class="red small" onclick="showDeleteStudentModal(${index})">删除</button>
+                        </div>
+                        <div class="history-log">
+                            ${recentHistory.map((item) => `
+                                <div class="history-item">
+                                    <span class="history-time">${item.time}</span>
+                                    <span class="history-detail">${item.detail}</span>
+                                    <span class="history-amount ${item.amount > 0 ? 'positive' : 'negative'}">${item.amount > 0 ? '+' : ''}${item.amount}</span>
+                                </div>
+                            `).join('')}
+                            ${hasMore ? '<button class="show-more-btn" onclick="showAllHistory(this, ' + index + ')">显示更多记录 (' + (student.history.length - 5) + ')</button>' : ''}
+                        </div>
+                    `;
+                    studentContainer.appendChild(card);
+                });
+            }
+        }
+
+        // 显示所有历史记录
+        function showAllHistory(button, studentIndex) {
+            const currentClass = getCurrentClass();
+            const student = currentClass.students[studentIndex];
+            const historyLog = button.parentElement;
+            
+            historyLog.innerHTML = student.history.map((item) => `
+                <div class="history-item">
+                    <span class="history-time">${item.time}</span>
+                    <span class="history-detail">${item.detail}</span>
+                    <span class="history-amount ${item.amount > 0 ? 'positive' : 'negative'}">${item.amount > 0 ? '+' : ''}${item.amount}</span>
+                </div>
+            `).join('');
+            
+            historyLog.innerHTML += '<button class="show-more-btn" onclick="this.parentElement.innerHTML = this.parentElement.innerHTML; renderStudents()">收起记录</button>';
+            historyLog.scrollTop = historyLog.scrollHeight;
+        }
+
+        // 获取当前班级
+        function getCurrentClass() {
+            return appData.classes.find((cls) => cls.id === appData.currentClassId);
+        }
+
+        // 更新班级名称
+        function updateClassName() {
+            const currentClass = getCurrentClass();
+            const classNameInput = document.getElementById('className');
+            currentClass.name = classNameInput.value;
+            saveAppData();
+            renderClassSelector();
+        }
+
+        // 切换班级
+        function changeClass() {
+            const classSelect = document.getElementById('classSelect');
+            appData.currentClassId = classSelect.value;
+            saveAppData();
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 保存应用数据
+        function saveAppData() {
+            localStorage.setItem('classPointsApp', JSON.stringify(appData));
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+        }
+
+        // 隐藏模态框
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // 添加学生
+        function addStudent() {
+            const newStudentName = document.getElementById('newStudentName').value;
+            const newStudentPoints = parseInt(document.getElementById('newStudentPoints').value);
+
+            if (newStudentName) {
+                const currentClass = getCurrentClass();
+                
+                // 生成学生序号：年月日+姓名首字母（如20230720ZS）
+                const now = new Date();
+                const dateStr = now.getFullYear().toString() + 
+                               (now.getMonth() + 1).toString().padStart(2, '0') + 
+                               now.getDate().toString().padStart(2, '0');
+                const initials = newStudentName.split('').filter(c => /[\u4e00-\u9fa5]/.test(c))
+                                     .slice(0, 2)
+                                     .map(c => c.toUpperCase())
+                                     .join('');
+                const studentId = dateStr + initials;
+                
+                currentClass.students.push({
+                    id: studentId,
+                    name: newStudentName,
+                    points: newStudentPoints,
+                    history: [
+                        {
+                            time: now.toLocaleString(),
+                            detail: '初始积分',
+                            amount: newStudentPoints
+                        }
+                    ]
+                });
+                saveAppData();
+                hideModal('addStudentModal');
+                renderClassInfo();
+                renderStudents();
+            }
+        }
+
+        // 创建新班级
+        function createNewClass() {
+            const newClassName = document.getElementById('newClassName').value;
+            if (newClassName) {
+                const newClassId = `class-${Date.now()}`;
+                appData.classes.push({
+                    id: newClassId,
+                    name: newClassName,
+                    students: []
+                });
+                appData.currentClassId = newClassId;
+                saveAppData();
+                hideModal('addClassModal');
+                renderClassSelector();
+                renderClassInfo();
+                renderStudents();
+            }
+        }
+
+        // 显示添加班级模态框
+        function showAddClassModal() {
+            document.getElementById('newClassName').value = '';
+            showModal('addClassModal');
+        }
+
+        // 显示添加学生模态框
+        function showAddStudentModal() {
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentPoints').value = 0;
+            showModal('addStudentModal');
+        }
+
+        // 显示移动学生模态框
+        function showMoveStudentModal(studentIndex) {
+            const moveStudentId = document.getElementById('moveStudentId');
+            const targetClassSelect = document.getElementById('targetClassSelect');
+            const currentClass = getCurrentClass();
+
+            moveStudentId.value = studentIndex + 1;
+            targetClassSelect.innerHTML = '';
+            appData.classes.forEach((cls) => {
+                if (cls.id !== appData.currentClassId) {
+                    const option = document.createElement('option');
+                    option.value = cls.id;
+                    option.textContent = cls.name;
+                    targetClassSelect.appendChild(option);
+                }
+            });
+            showModal('moveStudentModal');
+        }
+
+        // 移动学生到其他班级
+        function moveStudentToClass() {
+            const moveStudentId = parseInt(document.getElementById('moveStudentId').value) - 1;
+            const targetClassId = document.getElementById('targetClassSelect').value;
+            const currentClass = getCurrentClass();
+            const targetClass = appData.classes.find((cls) => cls.id === targetClassId);
+
+            const student = currentClass.students.splice(moveStudentId, 1)[0];
+            
+            // 添加移动记录
+            student.history.push({
+                time: new Date().toLocaleString(),
+                detail: `从 ${currentClass.name} 移动到 ${targetClass.name}`,
+                amount: 0
+            });
+            
+            targetClass.students.push(student);
+            saveAppData();
+            hideModal('moveStudentModal');
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 显示删除学生模态框
+        function showDeleteStudentModal(studentIndex) {
+            const deleteStudentName = document.getElementById('deleteStudentName');
+            const currentClass = getCurrentClass();
+            deleteStudentName.textContent = currentClass.students[studentIndex].name;
+            showModal('deleteStudentModal');
+        }
+
+        // 删除学生
+        function deleteStudent() {
+            const deleteStudentName = document.getElementById('deleteStudentName').textContent;
+            const currentClass = getCurrentClass();
+            const studentIndex = currentClass.students.findIndex((student) => student.name === deleteStudentName);
+            currentClass.students.splice(studentIndex, 1);
+            saveAppData();
+            hideModal('deleteStudentModal');
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 变更学生积分
+        function changePoints(studentIndex, sign, amount) {
+            const currentClass = getCurrentClass();
+            const student = currentClass.students[studentIndex];
+            amount = parseInt(amount);
+            if (!isNaN(amount)) {
+                const newPoints = student.points + sign * amount;
+                student.points = Math.max(0, newPoints);
+                
+                // 确保history数组存在
+                if (!student.history) {
+                    student.history = [];
+                }
+                
+                student.history.push({
+                    time: new Date().toLocaleString(),
+                    detail: sign > 0 ? '增加积分' : '扣除积分',
+                    amount: sign * amount
+                });
+                saveAppData();
+                renderClassInfo();
+                renderStudents();
+            }
+        }
+
+        // 显示删除班级模态框
+        function showDeleteClassModal() {
+            const deleteClassName = document.getElementById('deleteClassName');
+            const currentClass = getCurrentClass();
+            deleteClassName.textContent = currentClass.name;
+            showModal('deleteClassModal');
+        }
+
+        // 删除班级
+        function deleteClass() {
+            const currentClassId = appData.currentClassId;
+            appData.classes = appData.classes.filter((cls) => cls.id !== currentClassId);
+
+            if (appData.classes.length === 0) {
+                // 如果删除后没有班级了，创建一个新的默认班级
+                const newClassId = `class-${Date.now()}`;
+                appData.classes.push({
+                    id: newClassId,
+                    name: '默认班级',
+                    students: []
+                });
+                appData.currentClassId = newClassId;
+            } else {
+                // 切换到第一个班级
+                appData.currentClassId = appData.classes[0].id;
+            }
+
+            saveAppData();
+            hideModal('deleteClassModal');
+            renderClassSelector();
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 批量操作相关函数
+        function updateBatchModalUI() {
+            const batchType = document.getElementById('batchType').value;
+            const batchAmountContainer = document.getElementById('batchAmountContainer');
+            
+            if (batchType === 'reset') {
+                batchAmountContainer.style.display = 'none';
+            } else {
+                batchAmountContainer.style.display = 'block';
+            }
+        }
+
+        function showBatchModal() {
+            document.getElementById('batchType').value = 'add';
+            document.getElementById('batchAmount').value = 1;
+            document.getElementById('batchAmountContainer').style.display = 'block';
+            showModal('batchModal');
+        }
+
+        function performBatchOperation() {
+            const batchType = document.getElementById('batchType').value;
+            const amount = parseInt(document.getElementById('batchAmount').value) || 0;
+            const currentClass = getCurrentClass();
+            
+            currentClass.students.forEach(student => {
+                // 确保history数组存在
+                if (!student.history) {
+                    student.history = [];
+                }
+                
+                if (batchType === 'add') {
+                    student.points += amount;
+                    student.history.push({
+                        time: new Date().toLocaleString(),
+                        detail: '批量增加积分',
+                        amount: amount
+                    });
+                } else if (batchType === 'deduct') {
+                    student.points = Math.max(0, student.points - amount);
+                    student.history.push({
+                        time: new Date().toLocaleString(),
+                        detail: '批量扣除积分',
+                        amount: -amount
+                    });
+                } else if (batchType === 'reset') {
+                    const deductedPoints = student.points;
+                    student.points = 0;
+                    student.history.push({
+                        time: new Date().toLocaleString(),
+                        detail: '批量清空积分',
+                        amount: -deductedPoints
+                    });
+                }
+            });
+            
+            saveAppData();
+            hideModal('batchModal');
+            renderClassInfo();
+            renderStudents();
+        }
+
+        // 导入学生功能
+        function showImportStudentsModal() {
+            document.getElementById('studentImportFile').value = '';
+            showModal('importStudentsModal');
+        }
+
+        function importStudents() {
+            const fileInput = document.getElementById('studentImportFile');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const lines = content.split('\n');
+                    const currentClass = getCurrentClass();
+                    const now = new Date();
+                    const dateStr = now.getFullYear().toString() + 
+                                   (now.getMonth() + 1).toString().padStart(2, '0') + 
+                                   now.getDate().toString().padStart(2, '0');
+                    
+                    lines.forEach(line => {
+                        if (line.trim()) {
+                            const parts = line.split(',');
+                            const name = parts[0] ? parts[0].trim() : '';
+                            const points = parts[1] ? parseInt(parts[1].trim()) : 0;
+                            
+                            if (name) {
+                                // 生成学生序号
+                                const initials = name.split('').filter(c => /[\u4e00-\u9fa5]/.test(c))
+                                             .slice(0, 2)
+                                             .map(c => c.toUpperCase())
+                                             .join('');
+                                const studentId = dateStr + initials;
+                                
+                                currentClass.students.push({
+                                    id: studentId,
+                                    name: name,
+                                    points: points,
+                                    history: [{
+                                        time: now.toLocaleString(),
+                                        detail: '初始积分',
+                                        amount: points
+                                    }]
+                                });
+                            }
+                        }
+                    });
+                    
+                    saveAppData();
+                    hideModal('importStudentsModal');
+                    renderClassInfo();
+                    renderStudents();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // 导出数据功能
+        function exportData() {
+            const currentClass = getCurrentClass();
+            let csvContent = `班级名称,${currentClass.name}\n`;
+            csvContent += "学生序号,学生姓名,积分\n";
+            
+            currentClass.students.forEach((student) => {
+                csvContent += `${student.id},${student.name},${student.points}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${currentClass.name}_学生数据_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>
